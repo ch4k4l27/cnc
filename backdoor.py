@@ -28,8 +28,6 @@ def download_file(file):
                 if not chunk:
                     break
                 f.write(chunk)
-    except socket.timeout:
-        print(f"[!] Timeout ao receber o arquivo: {file}")
     finally:
         soc.settimeout(None)
 

